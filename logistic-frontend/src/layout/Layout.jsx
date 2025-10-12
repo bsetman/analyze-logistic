@@ -19,7 +19,10 @@ export default function Layout({ children, sidebarContent }) {
                     zIndex: 1000,
                 }}
             >
-                🌍 Проект по Анализу Карт
+                🌍 Сервис по анализу региональной
+                транспортно-логистической
+                системы
+
             </header>
 
             {/* Сайдбар */}
@@ -97,7 +100,7 @@ export default function Layout({ children, sidebarContent }) {
                     padding: "8px",
                     textAlign: "center",
                     backgroundColor: "rgba(240,240,240,0.9)",
-                    opacity: 0, // изначально прозрачный
+                    opacity: 0,
                     transition: "opacity 0.3s",
                     zIndex: 1000,
                 }}
@@ -105,7 +108,7 @@ export default function Layout({ children, sidebarContent }) {
                 onMouseLeave={(e) => (e.currentTarget.style.opacity = 0)}
             >
                 <a href="https://github.com/agalikeev/analyze-logistic" target="_blank" rel="noopener noreferrer">
-                    Ссылка на проект
+                    Ссылка на наш github
                 </a>
             </footer>
         </div >
