@@ -107,9 +107,15 @@ export default function Layout({ children, sidebarContent }) {
                 onMouseEnter={(e) => (e.currentTarget.style.opacity = 1)}
                 onMouseLeave={(e) => (e.currentTarget.style.opacity = 0)}
             >
-                <a href="https://github.com/agalikeev/analyze-logistic" target="_blank" rel="noopener noreferrer">
-                    Ссылка на наш github
-                </a>
+                <div style={{ fontSize: "12px", color: "#444" }}>
+                    Карта © <a href="https://www.openstreetmap.org/copyright"
+                        target="_blank"
+                        rel="noopener noreferrer">OpenStreetMap</a> contributors
+                    <br />
+                    <a href="https://github.com/agalikeev/analyze-logistic" target="_blank" rel="noopener noreferrer">
+                        Ссылка на наш github
+                    </a>
+                </div>
             </footer>
         </div >
     );
