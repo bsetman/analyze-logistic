@@ -1,5 +1,4 @@
 import os
-from math import radians, sin, cos, sqrt, atan2
 from typing import Tuple, Dict, Any, Optional
 
 import folium
@@ -13,14 +12,6 @@ from haversine import haversine, Unit
 # =====================
 #  ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
 # =====================
-
-def haversine(lat1, lon1, lat2, lon2):
-    """Геодезическое расстояние между точками в метрах"""
-    R = 6371000
-    phi1, phi2 = radians(lat1), radians(lat2)
-    dphi, dlambda = radians(lat2 - lat1), radians(lon2 - lon1)
-    a = sin(dphi / 2) ** 2 + cos(phi1) * cos(phi2) * sin(dlambda / 2) ** 2
-    return 2 * R * atan2(sqrt(a), sqrt(1 - a))
 
 
 def get_default_tags(mode: str) -> Dict[str, list]:
@@ -104,11 +95,6 @@ def build_mst_graph(G: nx.Graph) -> nx.Graph:
     """Строит минимальное остовное дерево"""
     return nx.minimum_spanning_tree(G)
 
-
-import pandas as pd
-import folium
-import osmnx as ox
-from haversine import haversine
 
 def visualize_mst_map(coords_df, mst, bbox, mode, output_file="logistics_mst.html"):
     """
@@ -199,6 +185,8 @@ def visualize_mst_map(coords_df, mst, bbox, mode, output_file="logistics_mst.htm
     m.save(output_file)
     print(f"📄 Карта сохранена: {output_file}")
     return output_file
+
+
 # =====================
 #  ГЛАВНАЯ ФУНКЦИЯ API
 # =====================
