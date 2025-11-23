@@ -9,20 +9,7 @@ from math import radians, sin, cos, sqrt, atan2, isnan
 from typing import Tuple, Dict, Any, Optional
 
 from haversine import haversine, Unit
-
-
-# =====================
-#  ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
-# =====================
-
-# def haversine(lat1, lon1, lat2, lon2):
-#     """Геодезическое расстояние между точками в метрах"""
-#     R = 6371000
-#     phi1, phi2 = radians(lat1), radians(lat2)
-#     dphi, dlambda = radians(lat2 - lat1), radians(lon2 - lon1)
-#     a = sin(dphi / 2) ** 2 + cos(phi1) * cos(phi2) * sin(dlambda / 2) ** 2
-#     return 2 * R * atan2(sqrt(a), sqrt(1 - a))
-
+from scgraph.geographs.marnet import marnet_geograph
 
 def get_default_tags(mode: str) -> Dict[str, list]:
     """Возвращает набор OSM-тегов для логистических объектов по модам"""
@@ -147,6 +134,43 @@ def build_mst_rail_by_color(coords_df: pd.DataFrame) -> nx.Graph:
 
     return mst_total
 
+def build_sea_graph(coords_df: pd.DataFrame) -> nx.Graph:
+    """
+    Строит граф расстояний между морскими портами с учётом морских путей
+    через библиотеку marnet_geograph.
+    """
+    G = nx.Graph()
+    n = len(coords_df)
+    G.add_nodes_from(coords_df.index)
+
+    print("Используется marnet_geograph для расчёта морских расстояний...")
+
+    for i in range(n):
+        lat1, lon1 = coords_df.loc[i, ["lat", "lon"]]
+        for j in range(i + 1, n):
+            lat2, lon2 = coords_df.loc[j, ["lat", "lon"]]
+            try:
+                # Вызываем морской маршрут
+                output = marnet_geograph.get_shortest_path(
+                    origin_node={"latitude": lat1, "longitude": lon1},
+                    destination_node={"latitude": lat2, "longitude": lon2}
+                )
+                # посчитаем длину траектории по координатам
+                coord_path = output['coordinate_path']
+                dist_total = 0.0
+                for k in range(len(coord_path) - 1):
+                    lat_a, lon_a = coord_path[k]
+                    lat_b, lon_b = coord_path[k + 1]
+                    dist_total += haversine((lat_a, lon_a), (lat_b, lon_b))
+
+                G.add_edge(i, j, weight=dist_total)
+            except Exception as e:
+                print(f"Ошибка при расчёте пути ({i}-{j}): {e}")
+                # fallback — просто геодезическое расстояние
+                dist = haversine((lat1, lon1), (lat2, lon2))
+                G.add_edge(i, j, weight=dist)
+    return G
+
 def visualize_mst_map(coords_df, mst, bbox, mode, output_file="logistics_mst.html"):
     """
     Отображает MST на карте Folium.
@@ -178,7 +202,7 @@ def visualize_mst_map(coords_df, mst, bbox, mode, output_file="logistics_mst.htm
             popup=folium.Popup("<br>".join(popup_lines), max_width=500)
         ).add_to(m)
 
-    print(f"📥 Отрисовка рёбер для mode='{mode}' ...")
+    print(f"Отрисовка рёбер для mode='{mode}' ...")
 
     # --- рёбра ---
     for u, v, data in mst.edges(data=True):
@@ -207,7 +231,7 @@ def visualize_mst_map(coords_df, mst, bbox, mode, output_file="logistics_mst.htm
 
     # сохраняем на диск
     m.save(output_file)
-    print(f"📄 Карта сохранена: {output_file}")
+    print(f"Карта сохранена: {output_file}")
     return output_file
 
 # =====================

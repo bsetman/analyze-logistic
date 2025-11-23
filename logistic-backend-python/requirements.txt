@@ -11,3 +11,4 @@ pydantic==2.5.0
 fiona==1.9.5
 scikit-learn==1.4.2
 haversine==2.5
+scgraph==2.10.0
