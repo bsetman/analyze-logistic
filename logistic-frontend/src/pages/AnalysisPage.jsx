@@ -1,8 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "../layout/Layout";
 import MapView from "../components/MapView";
 
 export default function AnalysisPage() {
+
+    const navigate = useNavigate();
+
     // Состояние выбранной области
     const [selectedArea, setSelectedArea] = useState(null);
     const [point1, setPoint1] = useState("");
@@ -11,7 +15,7 @@ export default function AnalysisPage() {
 
     const sidebarContent = (
         <>
-            <h3 style={{ marginTop: 0, marginBottom: "16px" }}>📍 Ввод координат</h3>
+            <h3 style={{ marginTop: 0, marginBottom: "16px" }}>Ввод координат</h3>
             <label>
                 Точка 1 (lat,lng):
                 <input
@@ -35,7 +39,7 @@ export default function AnalysisPage() {
 
             {/* Блок выбора режима анализа */}
             <div style={{ marginTop: "20px" }}>
-                <h4 style={{ marginBottom: "8px" }}>🚦 Тип маршрута:</h4>
+                <h4 style={{ marginBottom: "8px" }}>Тип маршрута:</h4>
 
                 <label style={{ display: "block", marginBottom: "6px" }}>
                     <input
@@ -114,23 +118,20 @@ export default function AnalysisPage() {
             // Формируем URL для запроса на FastAPI
             const url = `http://localhost:8000/analyze?west=${minLng}&south=${minLat}&east=${maxLng}&north=${maxLat}&mode=${mode}`;
 
-            const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-            });
+            const response = await fetch(url, { method: "POST" });
+        if (!response.ok) throw new Error(`Ошибка сервера: ${response.status}`);
 
-            if (!response.ok) {
-                throw new Error(`Ошибка сервера: ${response.status}`);
-            }
-
-            const data = await response.json();
-            console.log("✅ Ответ от FastAPI:", data);
-            alert("✅ Анализ выполнен! Проверь консоль для деталей.");
-        } catch (err) {
-            console.error("❌ Ошибка при отправке:", err);
-            alert("Ошибка при обращении к серверу анализа!");
-        }
+        const data = await response.json();
+        return {
+            ...data,
+            bbox: [minLng, minLat, maxLng, maxLat],
+            mode,
+        };
+    } catch (err) {
+        console.error("❌ Ошибка при отправке:", err);
+        throw err;
     }
+}
 
     // Кнопка "Начать Анализ"
     const handleAnalyze = async () => {
@@ -143,7 +144,15 @@ export default function AnalysisPage() {
         // Создаём GeoJSON-объект из выбранной области
         const geojson = areaToGeoJSON(selectedArea, selectedMode);
         console.log("Отправляем GeoJSON:", geojson);
-        await sendGeoJSON(geojson);
+        try {
+            const resultData = await sendGeoJSON(geojson);
+
+             navigate("/result", { state: resultData });
+
+        } catch (err) {
+            console.error("Ошибка при отправке:", err);
+            alert("Ошибка при обращении к серверу анализа!");
+        }
     };
 
 
