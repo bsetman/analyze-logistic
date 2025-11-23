@@ -226,34 +226,28 @@ def visualize_mst_map(coords_df, mst, bbox, mode, output_file="logistics_mst.htm
         if mode == "auto":
             node_u = row_u["osm_node"]
             node_v = row_v["osm_node"]
-
             try:
                 route = ox.routing.shortest_path(G_drive, node_u, node_v, weight="length", cpus=4)
-            except Exception:
-                route = None
-
-            if route and len(route) > 1:
-                route_gdf = ox.routing.route_to_gdf(G_drive, route)
-                dist_m = float(route_gdf["length"].sum())
-                dist_km = dist_m / 1000.0
-                popup_html = f"<b>Расстояние по дорогам:</b> {dist_km:.2f}&nbsp;км"
-                color = "blue"
-                line_coords = list(zip(route_gdf.geometry.y, route_gdf.geometry.x))
-            else:
-                dist_hav = haversine(
+                if route and len(route) > 1:
+                    route_gdf = ox.routing.route_to_gdf(G_drive, route)
+                    dist_m = float(route_gdf["length"].sum())
+                    dist_km = dist_m / 1000.0
+                    popup_html = f"<b>Расстояние по дорогам:</b> {dist_km:.2f}&nbsp;км"
+                else:
+                    raise ValueError("Маршрут не найден.")
+            except Exception as e:
+                dist_km = haversine(
                     (row_u["lat"], row_u["lon"]),
                     (row_v["lat"], row_v["lon"])
                 )
-                popup_html = f"<b>Прямое расстояние:</b> {dist_hav:.2f}&nbsp;км"
-                color = "gray"
-                line_coords = [
-                    [row_u["lat"], row_u["lon"]],
-                    [row_v["lat"], row_v["lon"]]
-                ]
+                popup_html = f"<b>Прямое расстояние:</b> {dist_km:.2f}&nbsp;км (fallback)"
 
+            # Рисуем простую прямую между точками
             folium.PolyLine(
-                locations=line_coords,
-                color=color, weight=3, opacity=0.8,
+                locations=[[row_u["lat"], row_u["lon"]], [row_v["lat"], row_v["lon"]]],
+                color="gray",
+                weight=3,
+                opacity=0.8,
                 popup=folium.Popup(popup_html, max_width=250)
             ).add_to(m)
             continue
@@ -371,3 +365,7 @@ def generate_logistics_mst(
     }
 
 
+result = generate_logistics_mst(
+    bbox=(29.81, 59.87, 29.88, 59.89),
+    mode="auto",
+)
