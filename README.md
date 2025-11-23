@@ -10,8 +10,11 @@
 - [Node.js](https://nodejs.org/) v18+
 - [npm](https://www.npmjs.com/) (входит в состав Node.js)
 - [Python](https://www.python.org/) 3.9+
-- (Опционально) виртуальное окружение (`venv`)
 
 ### Установка и запуск
+Установка зависимостей
+```bash
+cd cd logistic-backend-python/ && pip install -r "requirements.txt"
+```
 
 #### Бэкенд (FastAPI)
