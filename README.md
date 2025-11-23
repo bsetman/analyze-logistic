@@ -1,10 +1,8 @@
-# analyze-logistic (написать по-русски)
-
-Краткое описание проекта: 
+# Сервис по анализу регионально-транспортной логистической системы
 
 ---
 
-## 1. Инструкция по запуску
+## Инструкция по запуску
 
 ### Требования
 - [Node.js](https://nodejs.org/) v18+
@@ -14,7 +12,19 @@
 ### Установка и запуск
 Установка зависимостей
 ```bash
-cd logistic-backend-python/ && pip install -r "requirements.txt"
+cd logistic-backend-python/ && pip install -r "requirements.txt" && cd ..
+```
+Запуск приложения Windows
+
+```bash
+start_win.bat
 ```
 
-#### Бэкенд (FastAPI)
+Запуск приложения Linux
+
+```bash
+./start_lin.sh
+```
+
+
+
