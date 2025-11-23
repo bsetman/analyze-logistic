@@ -105,7 +105,7 @@ def visualize_mst_map(coords_df, mst, bbox, output_file="logistics_mst.html"):
         zoom_start=11
     )
 
-    # --- точки
+    # точки
     for i, row in coords_df.iterrows():
         if pd.isna(row["lat"]) or pd.isna(row["lon"]):
             continue
@@ -121,32 +121,19 @@ def visualize_mst_map(coords_df, mst, bbox, output_file="logistics_mst.html"):
             popup=folium.Popup("<br>".join(popup_lines), max_width=500)
         ).add_to(m)
 
-    # --- рёбра и подписи расстояний
+    # рёбра и подписи расстояний
     for u, v, data in mst.edges(data=True):
         row_u, row_v = coords_df.loc[u], coords_df.loc[v]
         dist_m = float(data["weight"])
         dist_km = dist_m / 1000.0
-        midpoint = [(row_u["lat"] + row_v["lat"]) / 2, (row_u["lon"] + row_v["lon"]) / 2]
 
         folium.PolyLine(
-            locations=[[row_u["lat"], row_u["lon"]], [row_v["lat"], row_v["lon"]]],
-            color="blue", weight=2, opacity=0.6
-        ).add_to(m)
-
-        folium.map.Marker(
-            midpoint,
-            icon=folium.DivIcon(
-                html=f'''
-                <div style="
-                    font-size: 10pt; 
-                    color: white; 
-                    font-weight: bold;
-                    text-shadow: -1px -1px 2px black, 1px 1px 2px black;">
-                    {dist_km:.2f} км
-                </div>
-                '''
-            )
-        ).add_to(m)
+        locations=[[row_u["lat"], row_u["lon"]], [row_v["lat"], row_v["lon"]]],
+        color="blue",
+        weight=2,
+        opacity=0.6,
+        popup=f"Расстояние: {dist_km:.2f} км"
+    ).add_to(m)
 
     m.save(output_file)
     print(f"📄 Карта сохранена: {output_file}")
@@ -180,15 +167,13 @@ def generate_logistics_mst(
     mst = build_mst_graph(G)
     html_path = visualize_mst_map(coords_df, mst, bbox, output_file)
 
-    # ✅ Формируем полную структуру MST
+    # Формируем полную структуру MST
     points = []
     for _, row in coords_df.iterrows():
         clean_tags = {}
         for k, v in row["tags"].items():
-            # Пропускаем геометрию, она не сериализуется
             if k == "geometry":
                 continue
-            # Если значение NaN или None — ставим None
             if pd.isna(v):
                 clean_tags[k] = None
             else:
@@ -217,7 +202,6 @@ def generate_logistics_mst(
         "total_distance": total_distance,
         "points": points,
         "edges": edges,
-        # дополнительные поля (не мешают Pydantic, просто игнорируются)
         "map_path": html_path,
         "mode": mode,
         "bbox": bbox,
