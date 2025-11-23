@@ -14,7 +14,7 @@
 ### Установка и запуск
 Установка зависимостей
 ```bash
-cd cd logistic-backend-python/ && pip install -r "requirements.txt"
+cd logistic-backend-python/ && pip install -r "requirements.txt"
 ```
 
 #### Бэкенд (FastAPI)
