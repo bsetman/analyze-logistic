@@ -10,44 +10,53 @@
 - [Python](https://www.python.org/) 3.9+
 
 ### Установка и запуск
+Создание виртуального окружения
+```bash
+mkdir analyze-logistic/ && cd analyze-logistic && python -m venv env
+```
+
+Активация виртуального окружения
+* на Linux
+  ```bash
+  source env/bin/activate
+  ```
+* на Windows
+  ```bash
+  env\Scripts\activate
+  ```
+
 Установка зависимостей
 ```bash
 cd logistic-backend-python/ && pip install -r "requirements.txt" && cd ..
 ```
-Запуск приложения Windows
 
-```bash
-start.bat
-```
-
-Запуск приложения Linux
-
-```bash
-./start.sh
-```
+Запуск приложения 
+* на Linux
+  ```bash
+  ./start.sh
+  ```
+* на Windows
+  ```bash
+  start.bat
+  ```
 
 ### Структура репозитория
 
 ```markdown
 .
-├── cache                   # Папка для результатов
-├── logistic-backend/       # Бэкенд на FastAPI
-│   ├── src                 # Основная папка
-│   └── ...                 # Модули обработки данных, индексов, моделей
-│
-├── logistic-frontend/      # Фронтенд на Vite 
+├── logistic-frontend/        # Фронтенд на Vite 
 │   ├── package.json
 │   ├── src/
 │   └── ...
 │
-├── logistic-backend-python/         
-│   ├── modeles
+├── logistic-backend-python/  # Бэкенд на FastAPI        
+│   ├── models
 │   ├── services
-│   ├── main.py             # исполняемый backend файл
+│   ├── main.py             
 │   └── ...
 │
-├── start.sh                # Скрипт запуска (Linux/macOS)
-├── start.bat               # Скрипт запуска (Windows)
+├── start.sh                  # Скрипт запуска (Linux/macOS)
+├── start.bat                 # Скрипт запуска (Windows)
 └── README.md
 ```
 
